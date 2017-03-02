@@ -3,17 +3,23 @@
 
 # TODO: move to other file
 function is_valid_integer() {
-  if [ $# -ne 1 ] ; then
+  if [ $# -lt 1 ] ; then
     false
   else
-    local val=$1
-    if [ ${val:0:1} = "-" ] ; then
-      val=${val:1}
-    fi
-    case $val in
-      *[!0-9]*) false;;
-      *) true ;;
-    esac
+    while [ $# -gt 0 ] ; do
+      local val=$1
+      if [ ${val:0:1} = "-" ] ; then
+        val=${val:1}
+      fi
+      case $val in
+        *[!0-9]*) 
+          echo "[$1] is not a valid integer." 1>&2
+          return 1;;
+        *) ;;
+      esac
+      shift
+    done
+    true
   fi
 }
 
@@ -149,5 +155,55 @@ function string_ends_with() {
         false
       fi
     fi
+  fi
+}
+
+#
+# Parameters:
+# - $1 the string to take the substring from
+# - $2 the idx to start from (0 based)
+# - $3 [optional] the length of the substring; or until the end of $1 if not specified
+#
+# Returns:
+# - 1 if the wrong less than 2 parameters are passed
+# - 2 if $2 or $3 are not valid integers
+# - 3 if $2 is greater than the length of $1
+# - 4 if $2 is negative
+# - 5 if $3 is negative
+# - 0 in all other cases
+#
+# Output:
+# - stderr: when returning > 0, adequate error message
+# - stdout: when returning 0, the substring defined by the parameters.  
+#
+function string_substring() {
+  local usage="usage: string_substring <string> <idxstart> [lengthsubstr]"
+  if [ $# -lt 2 ] ; then
+    echo "$usage" 1>&2
+    return 1
+  fi
+  if ! is_valid_integer $2 $3 ; then
+    echo "$usage" 1>&2
+    return 2
+  fi
+  if [ $2 -ge ${#1} ] ; then
+    echo "$usage" 1>&2
+    echo "$2 can't be greater or equal to the length of [$1]" 1>&2
+    return 3
+  fi
+  if [ $2 -lt 0 ] ; then
+    echo "$usage" 1>&2
+    echo "<idxstart> can't be negative" 1>&2
+    return 4
+  fi
+  if [ $# -ge 3 ] ; then
+    if [ $3 -lt 0 ] ; then
+      echo "$usage" 1>&2
+      echo "[lengthsubstr] can't be negative" 1>&2
+      return 5
+    fi
+    echo ${1:$2:$3}  
+  else
+    echo ${1:$2}  
   fi
 }

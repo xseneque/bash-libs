@@ -164,4 +164,84 @@ test_string_ends_with_notsuffix() {
   assertEquals "" "$retval"
 }
 
+
+
+test_string_substring_no_param() {
+  local retval
+  retval=$(string_substring 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_string_substring_one_param() {
+  local retval
+  retval=$(string_substring "abc" 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+
+test_string_substring_invalid_int_idx_param() {
+  local retval
+  retval=$(string_substring "abc" "notAnInt" 2> /dev/null)
+  assertEquals 2 $?
+  assertEquals "" "$retval"
+}
+
+test_string_substring_invalid_int_length_param() {
+  local retval
+  retval=$(string_substring "abc" 2 "notAnInt" 2> /dev/null)
+  assertEquals 2 $?
+  assertEquals "" "$retval"
+}
+
+test_string_substring_idx_too_big() {
+  local retval
+  retval=$(string_substring "abc" 3 2> /dev/null)
+  assertEquals 3 $?
+  assertEquals "" "$retval"
+}
+
+test_string_substring_idx_negative() {
+  local retval
+  retval=$(string_substring "abc" -1 2> /dev/null)
+  assertEquals 4 $?
+  assertEquals "" "$retval"
+}
+
+test_string_substring_length_negative() {
+  local retval
+  retval=$(string_substring "abc" 0 -1 2> /dev/null)
+  assertEquals 5 $?
+  assertEquals "" "$retval"
+}
+
+test_string_substring_length_negative() {
+  local retval
+  retval=$(string_substring "abc" 0 -1 2> /dev/null)
+  assertEquals 5 $?
+  assertEquals "" "$retval"
+}
+
+test_string_substring_2params() {
+  local retval
+  retval=$(string_substring "abc" 1 )
+  assertEquals 0 $?
+  assertEquals "bc" "$retval"
+}
+
+test_string_substring_3params() {
+  local retval
+  retval=$(string_substring "abc" 1 1 )
+  assertEquals 0 $?
+  assertEquals "b" "$retval"
+}
+
+test_string_substring_3params_0length() {
+  local retval
+  retval=$(string_substring "abc" 1 0 )
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
+
 . ../lib/shunit2/source/2.1/src/shunit2
