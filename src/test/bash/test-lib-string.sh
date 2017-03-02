@@ -77,4 +77,45 @@ test_string_length() {
   assertEquals "3" "$retval" 
 }
 
+test_string_starts_with_one_param() {
+  local retval
+  retval=$(string_starts_with "abc")
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_string_starts_with_prefix_too_long() {
+  local retval
+  retval=$(string_starts_with "abc" "abcd")
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_string_starts_with_same_str() {
+  local retval
+  retval=$(string_starts_with "abc" "abc")
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
+
+test_string_starts_with_prefix() {
+  local retval
+  retval=$(string_starts_with "abc" "a")
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
+
+test_string_starts_with_emptystr() {
+  local retval
+  retval=$(string_starts_with "abc" "")
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
+
+test_string_starts_with_notprefix() {
+  local retval
+  retval=$(string_starts_with "abc" "bc")
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
 . ../lib/shunit2/source/2.1/src/shunit2

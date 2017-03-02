@@ -88,3 +88,34 @@ function string_length() {
     echo ${#1}
   fi
 }
+
+#
+# Parameters:
+# - $1 the string to check
+# - $2 the string that might be a prefix of $1
+#
+# Returns:
+# - true (0) if $1 starts with $2
+# - false (1) in all other cases
+# 
+# Output:
+# - stderr: nil
+# - stdout: nil
+#
+function string_starts_with() {
+  if [ $# -lt 2 ] ; then
+    # we do not have 2 arguments... so $2 can't be a prefix
+    false
+  else
+    if [ ${#1} -lt ${#2} ] ; then
+      # $2 is longer than $1
+      false
+    else
+      if [ "${1:0:${#2}}" = "$2" ] ; then
+        true
+      else
+        false
+      fi
+    fi
+  fi
+}
