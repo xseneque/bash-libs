@@ -22,11 +22,12 @@ function is_valid_integer() {
 # - $1: the string onto which to determine the empty status
 #
 # Returns:
-# - true if the parameter is empty or there are no parameters passed
-# - false if a non empty parameter is passed
+# - true (0) if the parameter is empty or there are no parameters passed
+# - false (1) if a non empty parameter is passed
 #
-# Usage example:
-#  string_is_empty "$param" && echo "missing value" 
+# Output:
+# - stderr: nil
+# - stdout: nil
 #
 function string_is_empty() {
   if [ $# -ge 1 ] && [ ${#1} -gt 0 ] ; then
@@ -40,7 +41,17 @@ function string_is_empty() {
 # Parameters:
 # - $1 the string to retrieve the char from
 # - $2 the index of the char to retrieve - 0 based
-
+#
+# Returns:
+# - 1 if the wrong number of arguments is passed
+# - 2 if the second argument is not valid integer
+# - 3 if the index is outside of $1 bounds
+# - 0 in other cases
+#
+# Output:
+# - stderr: when returning > 0: error message
+# - stdout: when returning   0: character at the specified index
+#
 function string_char_at() {
   if [ $# -ne 2 ] ; then
     echo "usage: string_char_at <string> <index_char_at>" 1>&2
@@ -57,4 +68,23 @@ function string_char_at() {
     return 3
   fi
   echo "${1:$2:1}"
+}
+
+#
+# Parameters
+# - $1 the string whose length we want to know about
+# 
+# Returns:
+# - 0 in all cases
+#
+# Output:
+# - stdout: the size of the string in input; if no string is passed, 0 is printed
+# - stderr: nil
+#
+function string_length() {
+  if [ $# -eq 0 ] ; then
+    echo 0
+  else
+    echo ${#1}
+  fi
 }
