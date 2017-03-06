@@ -182,6 +182,9 @@ test_string_ends_with_notsuffix() {
 }
 
 
+#
+# string_substring
+#
 
 test_string_substring_no_param() {
   local retval
@@ -275,6 +278,10 @@ test_string_substring_3params_0length() {
   assertEquals "" "$retval"
 }
 
+#
+# string_rtrim
+#
+
 test_string_rtrim_0params() {
   local retval
   retval=$(string_rtrim 2> /dev/null)
@@ -324,7 +331,23 @@ test_string_rtrim_2params_notspace_notending() {
   assertEquals "bb abc   aaa" "$retval"
 }
 
+test_string_rtrim_blank_str() {
+  local retval
+  retval=$(string_rtrim "" )
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
 
+test_string_rtrim_spaces_str() {
+  local retval
+  retval=$(string_rtrim "   " )
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
+
+#
+# string_ltrim
+#
 
 test_string_ltrim_0params() {
   local retval
@@ -375,9 +398,88 @@ test_string_ltrim_2params_notspace_notending() {
   assertEquals "aaa abc  bbb" "$retval"
 }
 
+test_string_ltrim_blank_str() {
+  local retval
+  retval=$(string_ltrim "" )
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
+
+test_string_ltrim_spaces_str() {
+  local retval
+  retval=$(string_ltrim "   " )
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
 
 
+#
+# string_trim
+#
 
+
+test_string_trim_0params() {
+  local retval
+	  retval=$(string_trim 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_string_trim_2params_second_too_long() {
+  local retval
+  retval=$(string_trim " abc " "  " 2> /dev/null)
+  assertEquals 2 $?
+  assertEquals " abc " "$retval"
+}
+
+test_string_trim_1param() {
+  local retval
+  retval=$(string_trim "   abc   ")
+  assertEquals 0 $?
+  assertEquals "abc" "$retval"
+}
+
+test_string_trim_1param_string_not_starting_with_space() {
+  local retval
+  retval=$(string_trim "abc   ")
+  assertEquals 0 $?
+  assertEquals "abc" "$retval"
+}
+
+test_string_trim_2params_space() {
+  local retval
+  retval=$(string_trim "   abc   " " ")
+  assertEquals 0 $?
+  assertEquals "abc" "$retval"
+}
+
+test_string_trim_2params_notspace() {
+  local retval
+  retval=$(string_trim "aaa   abc   aaa" "a")
+  assertEquals 0 $?
+  assertEquals "   abc   " "$retval"
+}
+
+test_string_trim_2params_notspace_notending() {
+  local retval
+  retval=$(string_trim "aaa abc  bbb" "b")
+  assertEquals 0 $?
+  assertEquals "aaa abc  " "$retval"
+}
+
+test_string_trim_blank_str() {
+  local retval
+  retval=$(string_trim "" )
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
+
+test_string_trim_spaces_str() {
+  local retval
+  retval=$(string_trim "   " )
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
 
 
 

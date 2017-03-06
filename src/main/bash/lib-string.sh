@@ -1,27 +1,10 @@
 #!/bin/bash
 
+if [ -z "$BASH_LIBS_STRING" ] ; then
+echo "Importing lib-string"
+BASH_LIBS_STRING=BASH_LIBS_STRING
 
-# TODO: move to other file
-function is_valid_integer() {
-  if [ $# -lt 1 ] ; then
-    false
-  else
-    while [ $# -gt 0 ] ; do
-      local val=$1
-      if [ ${val:0:1} = "-" ] ; then
-        val=${val:1}
-      fi
-      case $val in
-        *[!0-9]*) 
-          echo "[$1] is not a valid integer." 1>&2
-          return 1;;
-        *) ;;
-      esac
-      shift
-    done
-    true
-  fi
-}
+. lib-int.sh
 
 # 
 # Parameters:
@@ -297,3 +280,66 @@ function string_ltrim() {
   done
   echo "${1:$idx}"
 }
+
+#
+# Parameters:
+# - $1 the string to trim on both sides
+# - $2 [optional] the character to remove on both ends (default=' ')
+# 
+# Returns:
+# - 1 if less than 1 parameter is passed
+# - 2 if 2 parameters are passed but the second parameter is not exactly 1 char long
+# - 0 is all other cases
+#
+# Output:
+# - stderr: when returning > 0, adequate error message
+# - stdout: when returning > 0, $1 (when passed)
+#           when returning   0, $1 trimmed on both sides
+#
+function string_trim() {
+  local usage="usage: string_trim <string> [char_to_remove]"
+  local char_to_remove=" "
+  if [ $# -lt 1 ] ; then
+    echo "$usage" 1>&2
+    return 1
+  fi
+  if [ $# -ge 2 ] ; then
+    if [ ${#2} -ne 1 ] ; then
+      echo "$usage" 1>&2
+      echo "[char_to_remove] must be exactly one character long" 1>&2
+      echo "$1"
+      return 2
+    else
+      char_to_remove="$2"
+    fi
+  fi
+  local str="$1"
+  local -i str_len=${#str}
+  local -i lidx=0
+  local -i ridx=$((str_len - 1))
+  #trim left
+  while [ $str_len -gt 0 ] ; do
+    if [ "${str:$lidx:1}" = "$char_to_remove" ] ; then
+      str_len=$((str_len - 1))
+      lidx=$((lidx + 1)) 
+    else
+      break
+    fi
+  done
+  #trim right
+  while [ $str_len -gt 0 ] ; do
+    if [ "${1:$ridx:1}" = "$char_to_remove" ] ; then
+      str_len=$((str_len - 1))
+      ridx=$((ridx - 1)) 
+    else
+      break
+    fi
+  done
+  echo "${1:$lidx:$str_len}"
+}
+
+
+
+BASH_LIBS_STRING=
+unset BASH_LIBS_STRING
+fi
