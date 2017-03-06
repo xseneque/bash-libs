@@ -291,23 +291,23 @@ test_string_rtrim_2params_second_too_long() {
 
 test_string_rtrim_1param() {
   local retval
-  retval=$(string_rtrim "abc   ")
+  retval=$(string_rtrim "  abc   ")
   assertEquals 0 $?
-  assertEquals "abc" "$retval"
+  assertEquals "  abc" "$retval"
 }
 
 test_string_rtrim_1param_string_not_ending_with_space() {
   local retval
-  retval=$(string_rtrim "abc")
+  retval=$(string_rtrim "  abc")
   assertEquals 0 $?
-  assertEquals "abc" "$retval"
+  assertEquals "  abc" "$retval"
 }
 
 test_string_rtrim_2params_space() {
   local retval
-  retval=$(string_rtrim "abc   " " ")
+  retval=$(string_rtrim "   abc   " " ")
   assertEquals 0 $?
-  assertEquals "abc" "$retval"
+  assertEquals "   abc" "$retval"
 }
 
 test_string_rtrim_2params_notspace() {
@@ -319,10 +319,65 @@ test_string_rtrim_2params_notspace() {
 
 test_string_rtrim_2params_notspace_notending() {
   local retval
-  retval=$(string_rtrim "abc   aaa" "b")
+  retval=$(string_rtrim "bb abc   aaa" "b")
   assertEquals 0 $?
-  assertEquals "abc   aaa" "$retval"
+  assertEquals "bb abc   aaa" "$retval"
 }
+
+
+
+test_string_ltrim_0params() {
+  local retval
+  retval=$(string_ltrim 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_string_ltrim_2params_second_too_long() {
+  local retval
+  retval=$(string_ltrim " abc " "  " 2> /dev/null)
+  assertEquals 2 $?
+  assertEquals " abc " "$retval"
+}
+
+test_string_ltrim_1param() {
+  local retval
+  retval=$(string_ltrim "   abc   ")
+  assertEquals 0 $?
+  assertEquals "abc   " "$retval"
+}
+
+test_string_ltrim_1param_string_not_starting_with_space() {
+  local retval
+  retval=$(string_ltrim "abc  ")
+  assertEquals 0 $?
+  assertEquals "abc  " "$retval"
+}
+
+test_string_ltrim_2params_space() {
+  local retval
+  retval=$(string_ltrim "   abc   " " ")
+  assertEquals 0 $?
+  assertEquals "abc   " "$retval"
+}
+
+test_string_ltrim_2params_notspace() {
+  local retval
+  retval=$(string_ltrim "aaa   abc   aaa" "a")
+  assertEquals 0 $?
+  assertEquals "   abc   aaa" "$retval"
+}
+
+test_string_ltrim_2params_notspace_notending() {
+  local retval
+  retval=$(string_ltrim "aaa abc  bbb" "b")
+  assertEquals 0 $?
+  assertEquals "aaa abc  bbb" "$retval"
+}
+
+
+
+
 
 
 

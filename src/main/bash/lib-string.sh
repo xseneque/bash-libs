@@ -252,3 +252,48 @@ function string_rtrim() {
   done
   echo "${1:0:$string_len}"
 }
+
+#
+# Parameters:
+# - $1 the string to trim on the left
+# - $2 [optional] the character to remove on the left (default=' ')
+# 
+# Returns:
+# - 1 if less than 1 parameter is passed
+# - 2 if 2 parameters are passed but the second parameter is not exactly 1 char long
+# - 0 is all other cases
+#
+# Output:
+# - stderr: when returning > 0, adequate error message
+# - stdout: when returning > 0, $1 (when passed)
+#           when returning   0, $1 trimmed on the left
+#
+function string_ltrim() {
+  local usage="usage: string_ltrim <string> [char_to_remove]"
+  local char_to_remove=" "
+  if [ $# -lt 1 ] ; then
+    echo "$usage" 1>&2
+    return 1
+  fi
+  if [ $# -ge 2 ] ; then
+    if [ ${#2} -ne 1 ] ; then
+      echo "$usage" 1>&2
+      echo "[char_to_remove] must be exactly one character long" 1>&2
+      echo "$1"
+      return 2
+    else
+      char_to_remove="$2"
+    fi
+  fi
+  local -i string_len=${#1}
+  local -i idx=0
+  while [ $string_len -gt 0 ] ; do
+    if [ "${1:$idx:1}" = "$char_to_remove" ] ; then
+      string_len=$((string_len - 1))
+      idx=$((idx + 1)) 
+    else
+      break
+    fi
+  done
+  echo "${1:$idx}"
+}
