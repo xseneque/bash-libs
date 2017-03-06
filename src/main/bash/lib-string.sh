@@ -202,8 +202,53 @@ function string_substring() {
       echo "[lengthsubstr] can't be negative" 1>&2
       return 5
     fi
-    echo ${1:$2:$3}  
+    echo "${1:$2:$3}"
   else
-    echo ${1:$2}  
+    echo "${1:$2}"
   fi
+}
+
+#
+# Parameters:
+# - $1 the string to trim on the right
+# - $2 [optional] the character to remove on the right (default=' ')
+# 
+# Returns:
+# - 1 if less than 1 parameter is passed
+# - 2 if 2 parameters are passed but the second parameter is not exactly 1 char long
+# - 0 is all other cases
+#
+# Output:
+# - stderr: when returning > 0, adequate error message
+# - stdout: when returning > 0, $1 (when passed)
+#           when returning   0, $1 trimmed on the right
+#
+function string_rtrim() {
+  local usage="usage: string_rtrim <string> [char_to_remove]"
+  local char_to_remove=" "
+  if [ $# -lt 1 ] ; then
+    echo "$usage" 1>&2
+    return 1
+  fi
+  if [ $# -ge 2 ] ; then
+    if [ ${#2} -ne 1 ] ; then
+      echo "$usage" 1>&2
+      echo "[char_to_remove] must be exactly one character long" 1>&2
+      echo "$1"
+      return 2
+    else
+      char_to_remove="$2"
+    fi
+  fi
+  local -i string_len=${#1}
+  local -i idx=$((string_len - 1))
+  while [ $string_len -gt 0 ] ; do
+    if [ "${1:$idx:1}" = "$char_to_remove" ] ; then
+      string_len=$((string_len - 1))
+      idx=$((idx - 1)) 
+    else
+      break
+    fi
+  done
+  echo "${1:0:$string_len}"
 }

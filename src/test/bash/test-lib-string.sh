@@ -75,6 +75,9 @@ test_string_length() {
   retval=$(string_length abc)
   assertEquals 0 $?
   assertEquals "3" "$retval" 
+  retval=$(string_length " abc ")
+  assertEquals 0 $?
+  assertEquals "5" "$retval" 
 }
 
 test_string_starts_with_one_param() {
@@ -101,6 +104,13 @@ test_string_starts_with_same_str() {
 test_string_starts_with_prefix() {
   local retval
   retval=$(string_starts_with "abc" "a")
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
+
+test_string_starts_with_spaceprefix() {
+  local retval
+  retval=$(string_starts_with " a bc" " a b")
   assertEquals 0 $?
   assertEquals "" "$retval"
 }
@@ -146,6 +156,13 @@ test_string_ends_with_same_str() {
 test_string_ends_with_suffix() {
   local retval
   retval=$(string_ends_with "abc" "c")
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
+
+test_string_ends_with_spacesuffix() {
+  local retval
+  retval=$(string_ends_with "ab c " "b c ")
   assertEquals 0 $?
   assertEquals "" "$retval"
 }
@@ -230,11 +247,25 @@ test_string_substring_2params() {
   assertEquals "bc" "$retval"
 }
 
+test_string_substring_2params_space() {
+  local retval
+  retval=$(string_substring "ab c " 1 )
+  assertEquals 0 $?
+  assertEquals "b c " "$retval"
+}
+
 test_string_substring_3params() {
   local retval
   retval=$(string_substring "abc" 1 1 )
   assertEquals 0 $?
   assertEquals "b" "$retval"
+}
+
+test_string_substring_3params_space() {
+  local retval
+  retval=$(string_substring "a bc" 1 1 )
+  assertEquals 0 $?
+  assertEquals " " "$retval"
 }
 
 test_string_substring_3params_0length() {
@@ -243,5 +274,56 @@ test_string_substring_3params_0length() {
   assertEquals 0 $?
   assertEquals "" "$retval"
 }
+
+test_string_rtrim_0params() {
+  local retval
+  retval=$(string_rtrim 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_string_rtrim_2params_second_too_long() {
+  local retval
+  retval=$(string_rtrim "abc " "  " 2> /dev/null)
+  assertEquals 2 $?
+  assertEquals "abc " "$retval"
+}
+
+test_string_rtrim_1param() {
+  local retval
+  retval=$(string_rtrim "abc   ")
+  assertEquals 0 $?
+  assertEquals "abc" "$retval"
+}
+
+test_string_rtrim_1param_string_not_ending_with_space() {
+  local retval
+  retval=$(string_rtrim "abc")
+  assertEquals 0 $?
+  assertEquals "abc" "$retval"
+}
+
+test_string_rtrim_2params_space() {
+  local retval
+  retval=$(string_rtrim "abc   " " ")
+  assertEquals 0 $?
+  assertEquals "abc" "$retval"
+}
+
+test_string_rtrim_2params_notspace() {
+  local retval
+  retval=$(string_rtrim "abc   aaa" "a")
+  assertEquals 0 $?
+  assertEquals "abc   " "$retval"
+}
+
+test_string_rtrim_2params_notspace_notending() {
+  local retval
+  retval=$(string_rtrim "abc   aaa" "b")
+  assertEquals 0 $?
+  assertEquals "abc   aaa" "$retval"
+}
+
+
 
 . ../lib/shunit2/source/2.1/src/shunit2
