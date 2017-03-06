@@ -46,7 +46,7 @@ function string_char_at() {
     echo "usage: string_char_at <string> <index_char_at>" 1>&2
     return 1
   fi
-  if ! is_valid_integer "$2" ; then
+  if ! int_is_valid "$2" ; then
     echo "usage: string_char_at <string> <index_char_at>" 1>&2
     echo "<index_char_at> must be an integer between 0 and up to the size of <string>" 1>&2
     return 2
@@ -165,7 +165,7 @@ function string_substring() {
     echo "$usage" 1>&2
     return 1
   fi
-  if ! is_valid_integer $2 $3 ; then
+  if ! int_is_valid $2 $3 ; then
     echo "$usage" 1>&2
     return 2
   fi

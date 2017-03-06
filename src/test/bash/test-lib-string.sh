@@ -1,6 +1,8 @@
 #!/bin/bash
 
-. ../../main/bash/lib-string.sh
+pushd ../../main/bash
+. ./lib-string.sh
+popd
 
 test_string_is_empty() {
   if ! string_is_empty "" ; then
