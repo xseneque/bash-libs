@@ -483,6 +483,121 @@ test_string_trim_spaces_str() {
   assertEquals "" "$retval"
 }
 
+#
+# string_to_uppercase
+#
 
+test_string_to_uppercase_no_params() {
+  local retval
+  retval=$(string_to_uppercase 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_string_to_uppercase_empty_param() {
+  local retval
+  retval=$(string_to_uppercase "")
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
+
+test_string_to_uppercase_one_param() {
+  local retval
+  retval=$(string_to_uppercase "aB c")
+  assertEquals 0 $?
+  assertEquals "AB C" "$retval"
+}
+
+test_string_to_uppercase_many_param() {
+  local retval
+  retval=$(string_to_uppercase "aB c" "" 12aa " " "That's it!")
+  assertEquals 0 $?
+  assertEquals "AB C  12AA   THAT'S IT!" "$retval"
+}
+
+#
+# string_to_lowercase
+#
+
+test_string_to_lowercase_no_params() {
+  local retval
+  retval=$(string_to_lowercase 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_string_to_lowercase_empty_param() {
+  local retval
+  retval=$(string_to_lowercase "")
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
+
+test_string_to_lowercase_one_param() {
+  local retval
+  retval=$(string_to_lowercase "aB c")
+  assertEquals 0 $?
+  assertEquals "ab c" "$retval"
+}
+
+test_string_to_lowercase_many_param() {
+  local retval
+  retval=$(string_to_lowercase "Ab C" "" 12AA " " "THAT's it!")
+  assertEquals 0 $?
+  assertEquals "ab c  12aa   that's it!" "$retval"
+}
+
+#
+# string_replace_first
+#
+
+test_string_replace_first_0_params() {
+  local retval
+  retval=$(string_replace_first 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_string_replace_first_1_params() {
+  local retval
+  retval=$(string_replace_first "mystring" 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_string_replace_first_2_params_2nd_empty() {
+  local retval
+  retval=$(string_replace_first "mystring" "" 2> /dev/null)
+  assertEquals 2 $?
+  assertEquals "mystring" "$retval"
+}
+
+test_string_replace_first_no_replacement_specified() {
+  local retval
+  retval=$(string_replace_first "aa bb cc" "bb ")
+  assertEquals 0 $?
+  assertEquals "aa cc" "$retval"
+}
+
+test_string_replace_first_no_replacement_no_match() {
+  local retval
+  retval=$(string_replace_first "aa bb cc" "a b c")
+  assertEquals 0 $?
+  assertEquals "aa bb cc" "$retval"
+}
+
+test_string_replace_first_with_replacement() {
+  local retval
+  retval=$(string_replace_first "aa bb cc " " cc " "THEEND")
+  assertEquals 0 $?
+  assertEquals "aa bbTHEEND" "$retval"
+}
+
+test_string_replace_first_with_replacement_no_match() {
+  local retval
+  retval=$(string_replace_first "aa bb cc " " c " "THEEND")
+  assertEquals 0 $?
+  assertEquals "aa bb cc " "$retval"
+}
 
 . ../lib/shunit2/source/2.1/src/shunit2

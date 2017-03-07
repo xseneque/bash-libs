@@ -338,7 +338,128 @@ function string_trim() {
   echo "${1:$lidx:$str_len}"
 }
 
+#
+# Parameters:
+# - 1 or more parameters
+#
+# Returns:
+# - 1 if no parameters are passed
+# - 0 in all other cases
+#
+# Output:
+# - stderr: when returning > 0, adequate error message
+# - stdout: when returning   0, all the input parameters in uppercase
+#
+function string_to_uppercase() {
+  local usage="usage: string_to_uppercase <param1> [param2 ... paramN]"
+  if [ $# -lt 1 ] ; then
+    echo "$usage" 1>&2
+    return 1
+  fi
+  local first=Y
+  while [ $# -gt 0 ] ; do
+    if [ "$first" = "Y" ] ; then
+      printf "%s" "${1^^}"
+      first=N
+    else
+      printf " %s" "${1^^}"
+    fi
+    shift
+  done
+  printf "\n"
+}
 
+#
+# Parameters:
+# - 1 or more parameters
+#
+# Returns:
+# - 1 if no parameters are passed
+# - 0 in all other cases
+#
+# Output:
+# - stderr: when returning > 0, adequate error message
+# - stdout: when returning   0, all the input parameters in lowercase
+#
+function string_to_lowercase() {
+  local usage="usage: string_to_lowercase <param1> [param2 ... paramN]"
+  if [ $# -lt 1 ] ; then
+    echo "$usage" 1>&2
+    return 1
+  fi
+  local first=Y
+  while [ $# -gt 0 ] ; do
+    if [ "$first" = "Y" ] ; then
+      printf "%s" "${1,,}"
+      first=N
+    else
+      printf " %s" "${1,,}"
+    fi
+    shift
+  done
+  printf "\n"
+}
+
+#
+# Parameters
+# - $1 the string to perform the replacement on
+# - $2 the string to replace in $1
+# - $3 [optional] the string to replace $2 with (default="")
+#
+# Returns:
+# - 1 if less than 2 parameters are passed
+# - 2 if $2 is empty
+# - 0 in all other cases
+#
+# Output:
+# - stderr: when returning > 0, an adequate error message
+# - stdout: when returning > 0, $1 as it is
+#           when returning   0, $1 with the first occurance of $2 replaced by $3
+function string_replace_first() {
+  local usage="usage: string_replace_first <string> <search> [replacement]"
+  local replacement=""
+  if [ $# -lt 2 ] ; then
+    echo "$usage" 1>&2
+    return 1
+  fi
+  if [ ${#2} -eq 0 ] ; then
+    echo "$usage" 1>&2
+    echo "<search> can't be empty" 1>&2
+    echo "$1"
+    return 2
+  fi
+  if [ $# -ge 3 ] ; then
+    replacement="${3}"
+  fi
+  local -i strIdx=0
+  while [ $strIdx -lt ${#1} ] ; do
+    if [ "${1:$strIdx:1}" = "${2:0:1}" ] ; then
+      #we have a potential match.. we need to check up to the length of $2
+      local -i potStrIdx=$((strIdx+1))
+      local -i searchIdx=1
+      local match=Y
+      while [ $searchIdx -lt ${#2} ] && [ $potStrIdx -lt ${#1} ] ; do
+        if [ "${1:$potStrIdx:1}" != "${2:$searchIdx:1}" ] ; then
+          match=N
+          break
+        else
+          potStrIdx=$((potStrIdx+1))
+          searchIdx=$((searchIdx+1))
+        fi 
+      done
+      if [ $match = Y ] && [ $searchIdx -eq ${#2} ] ; then
+        echo "${1:0:$strIdx}${replacement}${1:$potStrIdx}"
+        return 0
+      else
+        strIdx=$((strIdx+1))
+      fi
+    else
+      strIdx=$((strIdx+1))
+    fi
+  done
+  # nothing to replace
+  echo "$1"
+}
 
 BASH_LIBS_STRING=
 unset BASH_LIBS_STRING
