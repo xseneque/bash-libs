@@ -4,6 +4,10 @@ if [ -z "$BASH_LIBS_BASH" ] ; then
 echo "Importing lib-bash"
 BASH_LIBS_BASH=BASH_LIBS_BASH
 
+#
+# TODO: echoerr as a version of echo which prints to STDERR
+#
+
 # This method is purely aimed at escaping the pattern when using bash's
 # ${parameter/pattern/string} for substitution. 
 #
@@ -21,7 +25,7 @@ BASH_LIBS_BASH=BASH_LIBS_BASH
 function bash_escape_substitution_pattern() {
   local usage="usage: bash_escape_substitution_pattern <pattern_to_escape>"
   if [ $# -lt 1 ] ; then
-    echo
+    echo "$usage" 1>&2
     return 1
   fi
   local pattern="${1}"

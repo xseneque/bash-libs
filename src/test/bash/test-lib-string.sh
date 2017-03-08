@@ -670,4 +670,48 @@ test_string_replace_first_startbackslash() {
   assertEquals "abd" "$retval"
 }
 
+#
+# string_replace_all
+#
+
+test_string_replace_all_0_params() {
+  local retval
+  retval=$(string_replace_all 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_string_replace_all_1_params() {
+  local retval
+  retval=$(string_replace_all "mystring" 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "mystring" "$retval"
+}
+
+test_string_replace_all_2_params_2nd_empty() {
+  local retval
+  retval=$(string_replace_all "mystring" "" 2> /dev/null)
+  assertEquals 2 $?
+  assertEquals "mystring" "$retval"
+}
+
+test_string_replace_all_no_replacement_specified() {
+  local retval
+  retval=$(string_replace_all "aa bb cc" "b")
+  assertEquals 0 $?
+  assertEquals "aa  cc" "$retval"
+}
+
+test_string_replace_all_nothing_to_replace() {
+  local retval
+  retval=$(string_replace_all "aa bb cc" "z")
+  assertEquals 0 $?
+  assertEquals "aa bb cc" "$retval"
+}
+
+
+
+
+
+
 . ../lib/shunit2/source/2.1/src/shunit2
