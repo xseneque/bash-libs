@@ -403,7 +403,7 @@ function string_to_lowercase() {
 #
 # Parameters
 # - $1 the string to perform the replacement on
-# - $2 the string to replace in $1
+# - $2 the string to replace in $1 (litteral string, not a pattern)
 # - $3 [optional] the string to replace $2 with (default="")
 #
 # Returns:
@@ -415,11 +415,51 @@ function string_to_lowercase() {
 # - stderr: when returning > 0, an adequate error message
 # - stdout: when returning > 0, $1 as it is
 #           when returning   0, $1 with the first occurance of $2 replaced by $3
+#
 function string_replace_first() {
   local usage="usage: string_replace_first <string> <search> [replacement]"
   local replacement=""
   if [ $# -lt 2 ] ; then
     echo "$usage" 1>&2
+    echo "$1"
+    return 1
+  fi
+  if [ ${#2} -eq 0 ] ; then
+    echo "$usage" 1>&2
+    echo "<search> can't be empty" 1>&2
+    echo "$1"
+    return 2
+  fi
+  if [ $# -ge 3 ] ; then
+    replacement="${3}"
+  fi
+  # need to escape in search:
+  local search=${2}
+  # any '\'
+  search="${search//\\/\\\\}"
+  # leading '#' and '/' and '%'
+  case "$search" in
+    \#*) search="\\$search";;
+    /*) search="\\$search";;
+    %*) search="\\$search";;
+  esac
+  # any '*'
+  search="${search//\*/\\*}"
+  # any '?'
+  search="${search//\?/\\?}"
+  echo "${1/${search}/${replacement}}"
+}
+
+#
+# Below is my own implementation without using bash's ${parameter/pattern/string}
+# More logic but less escaping!
+#
+function string_replace_first_own() {
+  local usage="usage: string_replace_first <string> <search> [replacement]"
+  local replacement=""
+  if [ $# -lt 2 ] ; then
+    echo "$usage" 1>&2
+    echo "$1"
     return 1
   fi
   if [ ${#2} -eq 0 ] ; then

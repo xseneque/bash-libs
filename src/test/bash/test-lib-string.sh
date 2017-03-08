@@ -562,7 +562,7 @@ test_string_replace_first_1_params() {
   local retval
   retval=$(string_replace_first "mystring" 2> /dev/null)
   assertEquals 1 $?
-  assertEquals "" "$retval"
+  assertEquals "mystring" "$retval"
 }
 
 test_string_replace_first_2_params_2nd_empty() {
@@ -598,6 +598,76 @@ test_string_replace_first_with_replacement_no_match() {
   retval=$(string_replace_first "aa bb cc " " c " "THEEND")
   assertEquals 0 $?
   assertEquals "aa bb cc " "$retval"
+}
+
+test_string_replace_first_make_string_empty() {
+  local retval
+  retval=$(string_replace_first " abc " " abc " )
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
+
+test_string_replace_first_empty_input() {
+  local retval
+  retval=$(string_replace_first "" "a" )
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
+
+test_string_replace_first_manymatches() {
+  local retval
+  retval=$(string_replace_first "****" "*" )
+  assertEquals 0 $?
+  assertEquals "***" "$retval"
+}
+
+test_string_replace_first_qmark() {
+  local retval
+  retval=$(string_replace_first "*?*?**" "?" )
+  assertEquals 0 $?
+  assertEquals "**?**" "$retval"
+}
+
+test_string_replace_first_qmark2() {
+  local retval
+  retval=$(string_replace_first "*??**" "??" )
+  assertEquals 0 $?
+  assertEquals "***" "$retval"
+}
+
+test_string_replace_first_pound() {
+  local retval
+  retval=$(string_replace_first "*?}#a " "#a" )
+  assertEquals 0 $?
+  assertEquals "*?} " "$retval"
+}
+
+test_string_replace_first_pct() {
+  local retval
+  retval=$(string_replace_first "*?}%a $" "%a" )
+  assertEquals 0 $?
+  assertEquals "*?} $" "$retval"
+}
+
+test_string_replace_first_slash() {
+  local retval
+  retval=$(string_replace_first "/my/path/to/hell" "/hell" )
+  assertEquals 0 $?
+  assertEquals "/my/path/to" "$retval"
+}
+
+test_string_replace_first_slash2() {
+  local retval
+  retval=$(string_replace_first "/aaaa" "/a" )
+  assertEquals 0 $?
+  assertEquals "aaa" "$retval"
+}
+
+test_string_replace_first_startbackslash() {
+  local retval
+  retval=$(string_replace_first "ab\\cd" "\\c" )
+  assertEquals 0 $?
+  assertEquals "abd" "$retval"
 }
 
 . ../lib/shunit2/source/2.1/src/shunit2
