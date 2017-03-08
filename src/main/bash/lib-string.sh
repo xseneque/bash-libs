@@ -5,6 +5,7 @@ echo "Importing lib-string"
 BASH_LIBS_STRING=BASH_LIBS_STRING
 
 . lib-int.sh
+. lib-bash.sh
 
 # 
 # Parameters:
@@ -433,20 +434,7 @@ function string_replace_first() {
   if [ $# -ge 3 ] ; then
     replacement="${3}"
   fi
-  # need to escape in search:
-  local search=${2}
-  # any '\'
-  search="${search//\\/\\\\}"
-  # leading '#' and '/' and '%'
-  case "$search" in
-    \#*) search="\\$search";;
-    /*) search="\\$search";;
-    %*) search="\\$search";;
-  esac
-  # any '*'
-  search="${search//\*/\\*}"
-  # any '?'
-  search="${search//\?/\\?}"
+  local search=$(bash_escape_substitution_pattern "${2}")
   echo "${1/${search}/${replacement}}"
 }
 
