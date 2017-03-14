@@ -16,6 +16,10 @@ BASH_LIBS_ARRAY=BASH_LIBS_ARRAY
 # - stderr: when returning > 0, usage information
 # - stdout: nil
 #
+# In some version of bash, creating an array with no value will be a no-op
+# and thus will do nothing. This should not really impact the use of this
+# function except in rare scenarios.
+#
 function array_create() {
   local usage="usage: array_create <array_name> [value1] ... [valueN]"
   if [ $# -lt 1 ] ; then
@@ -26,9 +30,11 @@ function array_create() {
   shift
   if [ $# -eq 0 ] ; then
     #declaring an array with =() is not really valid so doesn't declare anything
-    eval "declare -xa ${array_name}"
+    eval "declare -ga ${array_name}"
   else
-    eval "declare -xa ${array_name}=(""$@"")"
+    local array_values
+    printf -v array_values "\"%s\" " "$@"
+    eval "declare -ga ${array_name}=(${array_values})"
   fi
 }
 
