@@ -96,6 +96,39 @@ test_array_add_elements_existing_array() {
   unset myarray
 }
 
+test_array_print_indices_no_array_name() {
+  local retval
+  retval=$(array_print_indices 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+
+test_array_print_indices_non_existing_array() {
+  local retval
+  retval=$(array_print_indices somefantomarrayABC 2> /dev/null)
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+}
+
+
+test_array_print_indices_existing_array() {
+  myarray[0]=abc
+  myarray[3]=three
+  myarray[42]=haha
+  local retval
+  retval=$(array_print_indices myarray 2> /dev/null)
+  assertEquals 0 $?
+  assertEquals "0 3 42" "$retval"
+  unset myarray
+}
+
+
+
+
+
+
+
 . ../lib/shunit2/source/2.1/src/shunit2
 
 

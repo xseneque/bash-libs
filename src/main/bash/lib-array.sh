@@ -32,9 +32,7 @@ function array_create() {
     #declaring an array with =() is not really valid so doesn't declare anything
     eval "declare -ga ${array_name}"
   else
-    local array_values
-    printf -v array_values "\"%s\" " "$@"
-    eval "declare -ga ${array_name}=(${array_values})"
+    eval "declare -ga ${array_name}=( \"\$@\" )"
   fi
 }
 
@@ -65,12 +63,36 @@ function array_add_elements() {
   fi
   local array_name=$1
   shift
-  if declare -p $array_name > /dev/null 2>&1 ; then
+  if declare -p "$array_name" > /dev/null 2>&1 ; then
     # the array exists, lets add the elements 
     eval "${array_name}+=( \"\$@\" )"
   else
     # the array doesn't exist, simply call array_create
-    array_create $array_name "$@"
+    array_create "$array_name" "$@"
+  fi
+}
+
+# Parameters
+# - $1 the name of the array
+#
+# Returns
+# - 1 if the array name is not supplied
+# - 0 otherwise
+#
+# Output
+# - stderr : when returning > 0, usage information
+# - stdout : when returning   0, the indices (keys) uses in the specified array
+#            if the array doesn't exist, nothing is printed
+#
+function array_print_indices() {
+  local usage="usage: array_print_indices <array_name>"
+  if [ $# -ne 1 ] ; then
+    echo "$usage" 1>&2
+    echo "array_name must be specified" 1>&2
+    return 1
+  fi
+  if declare -p "$1" > /dev/null 2>&1 ; then
+    eval "echo \${!$1[*]}"
   fi
 }
 
