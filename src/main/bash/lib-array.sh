@@ -38,6 +38,42 @@ function array_create() {
   fi
 }
 
+# Parameters:
+# - $1 the name of the array
+# - $2 .. $N values to add to the array
+#
+# Returns
+# - 1 if no array name is supplied
+# - 2 if no element is supplied
+# - 0 in all other cases
+#
+# Output:
+# - stderr: when returning > 0, usage information
+# - stdout: nil
+#
+function array_add_elements() {
+  local usage="usage: array_add_elements <array_name> <value1> ... [valueN]"
+  if [ $# -lt 1 ] ; then
+    echo "$usage" 1>&2
+    echo "array_name must be specified" 1>&2
+    return 1
+  fi
+  if [ $# -lt 2 ] ; then
+    echo "$usage" 1>&2
+    echo "at least one element must be specified" 1>&2
+    return 2
+  fi
+  local array_name=$1
+  shift
+  if declare -p $array_name > /dev/null 2>&1 ; then
+    # the array exists, lets add the elements 
+    eval "${array_name}+=( \"\$@\" )"
+  else
+    # the array doesn't exist, simply call array_create
+    array_create $array_name "$@"
+  fi
+}
+
 BASH_LIBS_ARRAY=
 unset BASH_LIBS_ARRAY
 fi

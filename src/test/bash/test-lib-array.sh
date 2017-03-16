@@ -52,7 +52,49 @@ test_array_create_3_values() {
   unset myarray
 }
 
+test_array_add_elements_no_params() {
+  local retval
+  retval=$(array_add_elements 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
 
+test_array_add_elements_no_ele() {
+  local retval
+  retval=$(array_add_elements myarray 2> /dev/null)
+  assertEquals 2 $?
+  assertEquals "" "$retval"
+}
+
+
+test_array_add_elements_non_existent_array() {
+  array_add_elements myarray 123 "abc d"
+  assertEquals 0 $?
+  if declare -p myarray > /dev/null 2>&1 ; then
+    assertEquals 2 ${#myarray[*]}
+    assertEquals "123" "${myarray[0]}"
+    assertEquals "abc d" "${myarray[1]}"
+  else
+    fail "myarray was not created"
+  fi
+  unset myarray
+}
+
+test_array_add_elements_existing_array() {
+  array_create myarray "a b" "c d"
+  array_add_elements myarray 123 "9 0"
+  assertEquals 0 $?
+  if declare -p myarray > /dev/null 2>&1 ; then
+    assertEquals 4 ${#myarray[*]}
+    assertEquals "a b" "${myarray[0]}"
+    assertEquals "c d" "${myarray[1]}"
+    assertEquals "123" "${myarray[2]}"
+    assertEquals "9 0" "${myarray[3]}"
+  else
+    fail "myarray was not created"
+  fi
+  unset myarray
+}
 
 . ../lib/shunit2/source/2.1/src/shunit2
 
