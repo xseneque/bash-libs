@@ -4,6 +4,15 @@ pushd ../../main/bash
 . ./lib-array.sh
 popd
 
+setUp() {
+  unset myarray 2> /dev/null
+  return 0
+}
+
+#
+# array_create
+#
+
 test_array_create_no_params() {
   local retval
   retval=$(array_create 2> /dev/null)
@@ -52,6 +61,10 @@ test_array_create_3_values() {
   unset myarray
 }
 
+######################################
+# array_add_elements
+######################################
+
 test_array_add_elements_no_params() {
   local retval
   retval=$(array_add_elements 2> /dev/null)
@@ -96,6 +109,10 @@ test_array_add_elements_existing_array() {
   unset myarray
 }
 
+######################################
+# array_print_indices
+######################################
+
 test_array_print_indices_no_array_name() {
   local retval
   retval=$(array_print_indices 2> /dev/null)
@@ -103,14 +120,12 @@ test_array_print_indices_no_array_name() {
   assertEquals "" "$retval"
 }
 
-
 test_array_print_indices_non_existing_array() {
   local retval
   retval=$(array_print_indices somefantomarrayABC 2> /dev/null)
   assertEquals 0 $?
   assertEquals "" "$retval"
 }
-
 
 test_array_print_indices_existing_array() {
   myarray[0]=abc
@@ -123,9 +138,95 @@ test_array_print_indices_existing_array() {
   unset myarray
 }
 
+######################################
+# array_print_size
+######################################
+
+test_array_print_size_no_params() {
+  local retval
+  retval=$(array_print_size 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_array_print_size_undeclared_array() {
+  local retval
+  retval=$(array_print_size myarray 2> /dev/null)
+  assertEquals 2 $?
+  assertEquals "" "$retval"
+  unset myarray
+}
+
+test_array_print_size_empty_array() {
+  local retval
+  declare -ga myarray=()
+  retval=$(array_print_size myarray 2> /dev/null)
+  assertEquals 0 $?
+  assertEquals "0" "$retval"
+  unset myarray
+}
+
+test_array_print_size_array() {
+  local retval
+  declare -ga myarray=(a b c)
+  retval=$(array_print_size myarray 2> /dev/null)
+  assertEquals 0 $?
+  assertEquals "3" "$retval"
+  unset myarray
+}
+
+######################################
+# array_print_entry
+######################################
+
+test_array_print_entry_no_params() {
+  local retval
+  retval=$(array_print_entry 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_array_print_entry_undeclared_array() {
+  local retval
+  retval=$(array_print_entry myarray 2> /dev/null)
+  assertEquals 2 $?
+  assertEquals "" "$retval"
+}
+
+test_array_print_entry_invalid_idx() {
+  local retval
+  retval=$(array_print_entry myarray abc 2> /dev/null)
+  assertEquals 3 $?
+  assertEquals "" "$retval"
+}
+
+test_array_print_entry_inexistant_entry() {
+  declare -ga myarray=(a b c)
+  local retval
+  retval=$(array_print_entry myarray 5 2> /dev/null)
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+  unset myarray
+}
+
+test_array_print_entry_empty_entry() {
+  declare -ga myarray=("" b c)
+  local retval
+  retval=$(array_print_entry myarray 0 2> /dev/null)
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+  unset myarray
+}
 
 
-
+test_array_print_entry_ok() {
+  declare -ga myarray=("" "b c" def)
+  local retval
+  retval=$(array_print_entry myarray 1 2> /dev/null)
+  assertEquals 0 $?
+  assertEquals "b c" "$retval"
+  unset myarray
+}
 
 
 
