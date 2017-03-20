@@ -309,6 +309,59 @@ test_array_contains_all_array_05() {
   unset myarray
 }
 
+########################################
+# array_contains_one
+########################################
+
+test_array_contains_one_no_params() {
+  local retval
+  retval=$(array_contains_one 2> /dev/null)
+  assertEquals 2 $?
+  assertEquals "" "$retval"
+}
+
+test_array_contains_one_undeclared_array() {
+  local retval
+  retval=$(array_contains_one myarray 2> /dev/null)
+  assertEquals 3 $?
+  assertEquals "" "$retval"
+}
+
+test_array_contains_one_array_no_searchval() {
+  declare -ga myarray=(a b c)
+  local retval
+  retval=$(array_contains_one myarray 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+  unset myarray
+}
+
+test_array_contains_one_array_01() {
+  declare -ga myarray=(a c "c c")
+  local retval
+  retval=$(array_contains_one myarray z "c c" d 2> /dev/null)
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+  unset myarray
+}
+
+test_array_contains_one_array_02() {
+  declare -ga myarray=(a c "c c")
+  local retval
+  retval=$(array_contains_one myarray z d 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+  unset myarray
+}
+
+
+
+
+
+
+
+
+
 . ../lib/shunit2/source/2.1/src/shunit2
 
 

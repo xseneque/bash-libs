@@ -188,7 +188,6 @@ function array_contains_all() {
   fi
   local array_name=$1
   shift
-  declare -i array_size=$(array_print_size "$array_name")
   while [ $# -gt 0 ] ; do
     declare -i idx=0
     for idx in $(array_print_indices "$array_name") ; do
@@ -198,10 +197,61 @@ function array_contains_all() {
         continue 2
       fi
     done
-    # we haven't found it in array_name...
+    # we haven't found it in $array_name...
     return 1
   done
   return 0 
+}
+
+# Parameters
+# - $1 the name of the array to look in
+# - $2 ... $N values to look for in the array
+#
+# Returns
+# - 0 if $1 contains at least one the values (if no values are passed, 1 rray to look in
+# - $2 ... $N values to look for in the array
+#
+# Returns
+# - 0 if $1 contains at least one the values (if no values are passed, 0 is returned)
+# - 1 if none of the $2 ... $N parameters are in $1
+# - 2 if $1 is missing
+# - 3 if $1 is not declaris returned)
+# - 1 if none of the $2 ... $N parameters are in $1
+# - 2 if $1 is missing
+# - 3 if $1 is not declared
+#
+# Output
+# - stderr: when returning 1, usage information
+#           else nil 
+# - stdout: nil
+#
+function array_contains_one() {
+  local usage="usage: array_contains_one <array_name> <searchVal1> [ ... <searchValN>]"
+  if [ $# -eq 0 ] ; then
+    echo "$usage" 1>&2
+    return 2
+  fi
+  if ! declare -p "$1" > /dev/null 2>&1 ; then
+    echo "$usage" 1>&2
+    echo "$1 is not declared" 1>&2
+    return 3
+  fi
+  local array_name=$1
+  shift
+  declare -i searchArrayIdx=0
+  declare -a searchVals=("$@")
+  for searchArrayIdx in $(array_print_indices "$array_name") ; do
+    local val=$(array_print_entry "$array_name" $searchArrayIdx)
+    declare -i paramIdx=1
+    while [ $paramIdx -le ${#searchVals[*]} ] ; do
+      if [ "${searchVals[$paramIdx]}" = "$val" ] ; then
+        return 0
+      else
+        paramIdx+=1
+      fi
+    done
+  done
+  return 1 
 }
 
 BASH_LIBS_ARRAY=
