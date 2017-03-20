@@ -151,7 +151,7 @@ function array_print_entry() {
     echo "$1 is not declared" 1>&2
     return 2
   fi
-  if is_valid_int "$2" ; then
+  if int_is_valid "$2" ; then
     eval "echo \${$1[$2]}"
   else
     echo "$usage" 1>&2

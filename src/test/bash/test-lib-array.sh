@@ -186,24 +186,33 @@ test_array_print_entry_no_params() {
   assertEquals "" "$retval"
 }
 
-test_array_print_entry_undeclared_array() {
+test_array_print_entry_one_param() {
   local retval
   retval=$(array_print_entry myarray 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_array_print_entry_undeclared_array() {
+  local retval
+  retval=$(array_print_entry myarray 0 2> /dev/null)
   assertEquals 2 $?
   assertEquals "" "$retval"
 }
 
 test_array_print_entry_invalid_idx() {
+  declare -ga myarray=(a b c)
   local retval
   retval=$(array_print_entry myarray abc 2> /dev/null)
   assertEquals 3 $?
   assertEquals "" "$retval"
+  unset myarray
 }
 
 test_array_print_entry_inexistant_entry() {
   declare -ga myarray=(a b c)
   local retval
-  retval=$(array_print_entry myarray 5 2> /dev/null)
+  retval=$(array_print_entry myarray 5)
   assertEquals 0 $?
   assertEquals "" "$retval"
   unset myarray
@@ -212,23 +221,83 @@ test_array_print_entry_inexistant_entry() {
 test_array_print_entry_empty_entry() {
   declare -ga myarray=("" b c)
   local retval
-  retval=$(array_print_entry myarray 0 2> /dev/null)
+  retval=$(array_print_entry myarray 0)
   assertEquals 0 $?
   assertEquals "" "$retval"
   unset myarray
 }
 
-
 test_array_print_entry_ok() {
   declare -ga myarray=("" "b c" def)
   local retval
-  retval=$(array_print_entry myarray 1 2> /dev/null)
+  retval=$(array_print_entry myarray 1)
   assertEquals 0 $?
   assertEquals "b c" "$retval"
   unset myarray
 }
 
+#######################################
+# array_contains_all
+#######################################
 
+test_array_contains_all_no_params() {
+  local retval
+  retval=$(array_contains_all 2> /dev/null)
+  assertEquals 2 $?
+  assertEquals "" "$retval"
+}
+
+test_array_contains_all_undeclared_array() {
+  local retval
+  retval=$(array_contains_all myarray 2> /dev/null)
+  assertEquals 3 $?
+  assertEquals "" "$retval"
+}
+
+test_array_contains_all_array_no_searchval() {
+  declare -ga myarray=(a b c)
+  local retval
+  retval=$(array_contains_all myarray 2> /dev/null)
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+  unset myarray
+}
+
+test_array_contains_all_array_01() {
+  declare -ga myarray=(a c "c c")
+  local retval
+  retval=$(array_contains_all myarray c "c c" 2> /dev/null)
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+  unset myarray
+}
+
+test_array_contains_all_array_02() {
+  declare -ga myarray=(a "a a a"  c)
+  local retval
+  retval=$(array_contains_all myarray "a a a" 2> /dev/null)
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+  unset myarray
+}
+
+test_array_contains_all_array_03() {
+  declare -ga myarray=(a b c)
+  local retval
+  retval=$(array_contains_all myarray b d 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+  unset myarray
+}
+
+test_array_contains_all_array_04() {
+  declare -ga myarray=(a b c)
+  local retval
+  retval=$(array_contains_all myarray d 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+  unset myarray
+}
 
 . ../lib/shunit2/source/2.1/src/shunit2
 
