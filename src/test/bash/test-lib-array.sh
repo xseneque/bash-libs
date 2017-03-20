@@ -299,6 +299,16 @@ test_array_contains_all_array_04() {
   unset myarray
 }
 
+test_array_contains_all_array_05() {
+  declare -ga myarray=(a b c)
+  myarray[10]=d
+  local retval
+  retval=$(array_contains_all myarray d 2> /dev/null)
+  assertEquals 0 $?
+  assertEquals "" "$retval"
+  unset myarray
+}
+
 . ../lib/shunit2/source/2.1/src/shunit2
 
 

@@ -191,13 +191,12 @@ function array_contains_all() {
   declare -i array_size=$(array_print_size "$array_name")
   while [ $# -gt 0 ] ; do
     declare -i idx=0
-    while [ $idx -lt $array_size ] ; do
+    for idx in $(array_print_indices "$array_name") ; do
       local val=$(array_print_entry "$array_name" $idx)
       if [ "$1" = "$val" ] ; then
         shift
         continue 2
       fi
-      idx+=1
     done
     # we haven't found it in array_name...
     return 1
