@@ -379,6 +379,7 @@ test_array_sort_00_noop() {
   assertEquals a ${myarray[0]} 
   assertEquals b ${myarray[1]} 
   assertEquals c ${myarray[2]} 
+  assertEquals 3 ${#myarray[*]}
   unset myarray
 }
 
@@ -389,6 +390,7 @@ test_array_sort_01() {
   assertEquals a ${myarray[0]} 
   assertEquals b ${myarray[1]} 
   assertEquals c ${myarray[2]} 
+  assertEquals 3 ${#myarray[*]}
   unset myarray
 }
 
@@ -405,9 +407,100 @@ test_array_sort_02() {
   assertEquals c "${myarray[8]}" 
   assertEquals "v w" "${myarray[12]}"
   assertEquals "z a" "${myarray[15]}"
+  assertEquals 6 ${#myarray[*]}
   unset myarray
 }
 
+test_array_sort_03() {
+  declare -ga myarray=(a)
+  array_sort myarray
+  assertEquals 0 $?
+  assertEquals a ${myarray[0]} 
+  assertEquals 1 ${#myarray[*]}
+  unset myarray
+}
+
+test_array_sort_04() {
+  declare -ga myarray=()
+  array_sort myarray
+  assertEquals 0 $?
+  assertEquals 0 ${#myarray[*]}
+  unset myarray
+}
+
+##################################################
+# array_reverse_sort
+##################################################
+
+test_array_reverse_sort_no_params() {
+  local retval
+  retval=$(array_reverse_sort 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
+
+test_array_reverse_sort_undeclared_array() {
+  local retval
+  retval=$(array_reverse_sort myarray 2> /dev/null)
+  assertEquals 2 $?
+  assertEquals "" "$retval"
+}
+
+test_array_reverse_sort_00_noop() {
+  declare -ga myarray=(c b a)
+  array_reverse_sort myarray
+  assertEquals 0 $?
+  assertEquals c ${myarray[0]} 
+  assertEquals b ${myarray[1]} 
+  assertEquals a ${myarray[2]} 
+  assertEquals 3 ${#myarray[*]}
+  unset myarray
+}
+
+test_array_reverse_sort_01() {
+  declare -ga myarray=(a c b)
+  array_reverse_sort myarray
+  assertEquals 0 $?
+  assertEquals c ${myarray[0]} 
+  assertEquals b ${myarray[1]} 
+  assertEquals a ${myarray[2]} 
+  assertEquals 3 ${#myarray[*]}
+  unset myarray
+}
+
+test_array_reverse_sort_02() {
+  declare -ga myarray=(a c b)
+  myarray[8]="z a"
+  myarray[12]="v w"
+  myarray[15]="_a"
+  array_reverse_sort myarray
+  assertEquals 0 $?
+  assertEquals a "${myarray[15]}"
+  assertEquals "_a" "${myarray[12]}"
+  assertEquals b "${myarray[8]}"
+  assertEquals c "${myarray[2]}" 
+  assertEquals "v w" "${myarray[1]}"
+  assertEquals "z a" "${myarray[0]}"
+  assertEquals 6 ${#myarray[*]}
+  unset myarray
+}
+
+test_array_reverse_sort_03() {
+  declare -ga myarray=(a)
+  array_reverse_sort myarray
+  assertEquals 0 $?
+  assertEquals a ${myarray[0]} 
+  assertEquals 1 ${#myarray[*]}
+  unset myarray
+}
+
+test_array_reverse_sort_04() {
+  declare -ga myarray=()
+  array_reverse_sort myarray
+  assertEquals 0 $?
+  assertEquals 0 ${#myarray[*]}
+  unset myarray
+}
 
 
 

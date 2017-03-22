@@ -254,6 +254,22 @@ function array_contains_one() {
   return 1 
 }
 
+# Parameters
+# - $1 the name of the array to sort
+#
+# Returns
+# - 1 if $1 is missing
+# - 2 if there is no declared array of name $1
+# - 0 in all other cases
+#
+# Output
+# - stderr: when returning > 1, usage information with optional error message
+# - stdout: nil
+#
+# Note: 
+# - sorting algorithm used is insertion sort
+# - order is lexicographical order as defined by bash and the current local ( use of [[ a < b ]])
+#
 function array_sort() {
   local usage="usage: array_sort <array_name>"
   if [ $# -eq 0 ] ; then
@@ -292,6 +308,64 @@ function array_sort() {
   done
   unset _i arrayLen arrayIndices array_name usage
 }
+
+# Parameters
+# - $1 the name of the array to reverse sort
+#
+# Returns
+# - 1 if $1 is missing
+# - 2 if there is no declared array of name $1
+# - 0 in all other cases
+#
+# Output
+# - stderr: when returning > 1, usage information with optional error message
+# - stdout: nil
+#
+# Note: 
+# - sorting algorithm used is insertion sort
+# - order is reversed lexicographical order as defined by bash and the current local ( use of [[ a > b ]])
+#
+function array_reverse_sort() {
+  local usage="usage: array_reverse_sort <array_name>"
+  if [ $# -eq 0 ] ; then
+    echo "$usage" 1>&2
+    return 1
+  fi
+  if ! declare -p "$1" > /dev/null 2>&1 ; then
+    echo "$usage" 1>&2
+    echo "$1 is not declared" 1>&2
+    return 2
+  fi
+  local array_name=$1
+  declare -a arrayIndices=( $(array_print_indices "$array_name") )
+  declare -i arrayLen=${#arrayIndices[*]}
+  declare -i _i=1
+  while [ $_i -lt $arrayLen ] ; do
+    declare -i _j=$_i
+    while [ $_j -gt 0 ] ; do
+      declare -i _jn=$(($_j - 1))
+      declare -i idxJ=${arrayIndices[$_j]}
+      declare -i idxJn=${arrayIndices[$_jn]}
+      local _valJ=$(eval "echo \${$array_name[$idxJ]}")
+      local _valJn=$(eval "echo \${$array_name[$idxJn]}")
+      if [[ "$_valJ" > "$_valJn" ]] ; then
+        eval "${array_name}[${idxJ}]=\"${_valJn}\"" 
+        eval "${array_name}[${idxJn}]=\"${_valJ}\"" 
+        _j=$_jn
+      else
+        unset _jn idxJ idxJn _valJ _valJn
+        break
+      fi
+      unset _jn idxJ idxJn _valJ _valJn
+    done
+    unset _j
+    _i+=1
+  done
+  unset _i arrayLen arrayIndices array_name usage
+}
+
+
+
 
 BASH_LIBS_ARRAY=
 unset BASH_LIBS_ARRAY
