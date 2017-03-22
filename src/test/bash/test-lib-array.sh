@@ -354,9 +354,59 @@ test_array_contains_one_array_02() {
   unset myarray
 }
 
+#############################################
+# array_sort
+#############################################
 
+test_array_sort_no_params() {
+  local retval
+  retval=$(array_sort 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
 
+test_array_sort_undeclared_array() {
+  local retval
+  retval=$(array_sort myarray 2> /dev/null)
+  assertEquals 2 $?
+  assertEquals "" "$retval"
+}
 
+test_array_sort_00_noop() {
+  declare -ga myarray=(a b c)
+  array_sort myarray
+  assertEquals 0 $?
+  assertEquals a ${myarray[0]} 
+  assertEquals b ${myarray[1]} 
+  assertEquals c ${myarray[2]} 
+  unset myarray
+}
+
+test_array_sort_01() {
+  declare -ga myarray=(a c b)
+  array_sort myarray
+  assertEquals 0 $?
+  assertEquals a ${myarray[0]} 
+  assertEquals b ${myarray[1]} 
+  assertEquals c ${myarray[2]} 
+  unset myarray
+}
+
+test_array_sort_02() {
+  declare -ga myarray=(a c b)
+  myarray[8]="z a"
+  myarray[12]="v w"
+  myarray[15]="_a"
+  array_sort myarray
+  assertEquals 0 $?
+  assertEquals a "${myarray[0]}"
+  assertEquals "_a" "${myarray[1]}"
+  assertEquals b "${myarray[2]}"
+  assertEquals c "${myarray[8]}" 
+  assertEquals "v w" "${myarray[12]}"
+  assertEquals "z a" "${myarray[15]}"
+  unset myarray
+}
 
 
 
