@@ -409,8 +409,8 @@ function array_sort_wfct() {
       declare -i _jn=$(($_j - 1))
       declare -i idxJ=${arrayIndices[$_j]}
       declare -i idxJn=${arrayIndices[$_jn]}
-      local _valJ=$(eval "echo \${$array_name[$idxJ]}")
-      local _valJn=$(eval "echo \${$array_name[$idxJn]}")
+      local _valJ=$(eval "echo \"\${$array_name[$idxJ]}\"")
+      local _valJn=$(eval "echo \"\${$array_name[$idxJn]}\"")
       if eval "$2 \"$_valJ\" \"$_valJn\" > /dev/null 2>&1" ; then
         eval "${array_name}[${idxJ}]=\"${_valJn}\"" 
         eval "${array_name}[${idxJn}]=\"${_valJ}\"" 

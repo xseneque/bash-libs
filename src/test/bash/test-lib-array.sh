@@ -532,8 +532,6 @@ test_array_sort_wfct_undeclared_function() {
 
 array_sort_ascii() {
   test "$1" \< "$2"
-  local retval=$?
-  return $retval
 }
 
 test_array_sort_wfct_empty_array(){
@@ -566,6 +564,25 @@ test_array_sort_wfct_reorder(){
   assertEquals c ${myarray[3]}
   unset myarray
 }
+
+test_array_sort_wfct_complex(){
+  declare -ga myarray=(" a" "_a" "d d" "c ")
+  myarray[5]="b a"
+  array_sort_wfct myarray array_sort_ascii
+  assertEquals 0 $?
+  assertEquals 5 ${#myarray[*]}
+  assertEquals " a" "${myarray[0]}"
+  assertEquals "_a" "${myarray[1]}"
+  assertEquals "b a" "${myarray[2]}"
+  assertEquals "c " "${myarray[3]}"
+  assertEquals "d d" "${myarray[5]}"
+  unset myarray
+}
+
+
+
+
+
 
 . ../lib/shunit2/source/2.1/src/shunit2
 
