@@ -365,6 +365,67 @@ function array_reverse_sort() {
 }
 
 
+# Parameters
+# - $1 the name of the array to sort
+# - $2 the name of the sort function to use. This function should accept two parameters and return 0
+#      when param1 < param2 and a value >= 1 otherwise. It is a "isLessThan" function.
+#
+# Returns
+# - 1 if $1 or $2 are missing
+# - 2 if there is no declared array of name $1
+# - 3 if there is no declare function of name $2
+# - 0 in all other cases
+#
+# Output
+# - stderr: when returning > 1, usage information with optional error message
+# - stdout: nil
+#
+# Note: 
+# - all output from function $2 is redirected to /dev/null; only its return code is used
+#
+function array_sort_wfct() {
+  local usage="usage: array_sort_wfct <array_name> <function_name>"
+  if [ $# -lt 2 ] ; then
+    echo "$usage" 1>&2
+    return 1
+  fi
+  if ! declare -p "$1" > /dev/null 2>&1 ; then
+    echo "$usage" 1>&2
+    echo "array $1 is not declared" 1>&2
+    return 2
+  fi
+  if ! declare -pF "$2" > /dev/null 2>&1 ; then
+    echo "$usage" 1>&2
+    echo "function $2 is not declared" 1>&2
+    return 3
+  fi
+  local array_name=$1
+  declare -a arrayIndices=( $(array_print_indices "$array_name") )
+  declare -i arrayLen=${#arrayIndices[*]}
+  declare -i _i=1
+  while [ $_i -lt $arrayLen ] ; do
+    declare -i _j=$_i
+    while [ $_j -gt 0 ] ; do
+      declare -i _jn=$(($_j - 1))
+      declare -i idxJ=${arrayIndices[$_j]}
+      declare -i idxJn=${arrayIndices[$_jn]}
+      local _valJ=$(eval "echo \${$array_name[$idxJ]}")
+      local _valJn=$(eval "echo \${$array_name[$idxJn]}")
+      if eval "$2 \"$_valJ\" \"$_valJn\" > /dev/null 2>&1" ; then
+        eval "${array_name}[${idxJ}]=\"${_valJn}\"" 
+        eval "${array_name}[${idxJn}]=\"${_valJ}\"" 
+        _j=$_jn
+      else
+        unset _jn idxJ idxJn _valJ _valJn
+        break
+      fi
+      unset _jn idxJ idxJn _valJ _valJn
+    done
+    unset _j
+    _i+=1
+  done
+  unset _i arrayLen arrayIndices array_name usage
+}
 
 
 BASH_LIBS_ARRAY=

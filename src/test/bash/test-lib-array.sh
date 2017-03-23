@@ -502,8 +502,70 @@ test_array_reverse_sort_04() {
   unset myarray
 }
 
+#####################################
+# array_sort_wfct
+#####################################
 
+test_array_sort_wfct_no_params() {
+  local retval
+  retval=$(array_sort_wfct 2> /dev/null)
+  assertEquals 1 $?
+  assertEquals "" "$retval"
+}
 
+test_array_sort_wfct_no_function() {
+  array_sort_wfct myarray 2> /dev/null
+  assertEquals 1 $?
+}
+
+test_array_sort_wfct_undeclared_array() {
+  array_sort_wfct myarray myfunction 2> /dev/null
+  assertEquals 2 $?
+}
+
+test_array_sort_wfct_undeclared_function() {
+  declare -ga myarray=()
+  array_sort_wfct myarray myfunction 2> /dev/null
+  assertEquals 3 $?
+  unset myarray
+}
+
+array_sort_ascii() {
+  test "$1" \< "$2"
+  local retval=$?
+  return $retval
+}
+
+test_array_sort_wfct_empty_array(){
+  declare -ga myarray=()
+  array_sort_wfct myarray array_sort_ascii
+  assertEquals 0 $?
+  assertEquals 0 ${#myarray[*]}
+  unset myarray
+}
+
+test_array_sort_wfct_noop(){
+  declare -ga myarray=(a b c)
+  array_sort_wfct myarray array_sort_ascii
+  assertEquals 0 $?
+  assertEquals 3 ${#myarray[*]}
+  assertEquals a ${myarray[0]}
+  assertEquals b ${myarray[1]}
+  assertEquals c ${myarray[2]}
+  unset myarray
+}
+
+test_array_sort_wfct_reorder(){
+  declare -ga myarray=(c b a b)
+  array_sort_wfct myarray array_sort_ascii
+  assertEquals 0 $?
+  assertEquals 4 ${#myarray[*]}
+  assertEquals a ${myarray[0]}
+  assertEquals b ${myarray[1]}
+  assertEquals b ${myarray[2]}
+  assertEquals c ${myarray[3]}
+  unset myarray
+}
 
 . ../lib/shunit2/source/2.1/src/shunit2
 
